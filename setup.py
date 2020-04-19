@@ -5,7 +5,7 @@ with open ("README.md", "r") as fh:
 
 setup(
     name="chromie",
-    version="0.0.1",
+    version="0.0.2",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Sandersland/chromie",
@@ -15,5 +15,5 @@ setup(
     extras_require={
         "dev": ["twine"]
     },
-    entry_points={"console_scripts": ["chromie=chromie:main"]}
+    entry_points={"console_scripts": ["chromie=chromie.chromie:main"]}
 )
