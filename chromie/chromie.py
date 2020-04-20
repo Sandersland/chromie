@@ -1,32 +1,43 @@
-import sys
-import os
-from typing import List
+import argparse
 
 from chromie.commands import init, package
 
-USAGE = """
-Usage: chromie init [--help]
-   or: chromie package [--help]
-""".strip()
+
+parser = argparse.ArgumentParser(prog="chromie")
+
+subparsers = parser.add_subparsers(help="commands", dest="command")
+
+init_parser = subparsers.add_parser("init", help="initialize project directory")
+
+init_parser.add_argument(
+    "-f", "--filepath", help="project directory", action="store", type=str
+)
+
+init_parser.add_argument("-n", "--name", help="Project name", action="store", type=str)
+
+package_parser = subparsers.add_parser("package", help="package project directory")
+
+package_parser.add_argument(
+    "-f", "--filepath", help="project directory", action="store", type=str
+)
+
 
 def main():
-    args = sys.argv[1:]
+
+    args = parser.parse_args()
 
     if not args:
-        raise SystemExit(USAGE)
+        raise SystemExit()
 
-    if args[0] == "--help":
-        print(USAGE, file=sys.stdout)
+    elif args.command == "init":
+        init(args)
 
-    elif args[0] == "init":
-        init()
-
-    elif args[0] == "package":
-        package()
+    elif args.command == "package":
+        package(args)
 
     else:
-        raise SystemExit(USAGE)
-    
+        raise SystemExit()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

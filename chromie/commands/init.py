@@ -4,12 +4,24 @@ import json
 
 
 ROOT = os.path.abspath(os.getcwd())
-NEW_DIRS = ("dist", "images", "images/web store",)
-NEW_BLANK_FILES = (".gitignore", ".zipignore")
+NEW_DIRS = (
+    "dist",
+    "images",
+    "images/web store",
+)
+NEW_BLANK_FILES = (
+    ".gitignore",
+    ".zipignore",
+)
 MANIFEST_FILE = "manifest.json"
 NAME_PROMPT = "What is the name of your project?\nname: "
-OVERWRITE_PROMPT = "This file or directory {} already exists.\nType (Y)es to overwrite. "
-AFFERMATIVE = ("Y", "YES",)
+OVERWRITE_PROMPT = (
+    "This file or directory {} already exists.\nType (Y)es to overwrite. "
+)
+AFFERMATIVE = (
+    "Y",
+    "YES",
+)
 NEGATIVE = ("N", "NO")
 TASK_COMPLETED = "Job completed."
 TASK_ABORTED = "Job aborted."
@@ -17,8 +29,8 @@ FILES_CREATED = "The following files or directories were created:\n"
 
 
 def prompt_overwrite(path):
-    #TODO: prevent this if -y is in argv
-    #TODO: make wrapper for this instead
+    # TODO: prevent this if -y is in argv
+    # TODO: make wrapper for this instead
     repeat = 0
     overwrite = input(OVERWRITE_PROMPT.format(path)).upper()
     repeat += 1
@@ -35,11 +47,20 @@ def prompt_overwrite(path):
         raise SystemExit(e)
 
 
-def init():
-    #TODO: impliment -f argument to specify directory and skip prompt if present
+def init(args):
     created = []
-    name = input(NAME_PROMPT)
-    root = os.path.join(ROOT, name)
+
+    if args.name:
+        name = args.name
+    else:
+        name = input(NAME_PROMPT)
+
+    if args.filepath:
+        filepath = os.path.abspath(args.filepath)
+        root = os.path.join(filepath, name)
+        print(root)
+    else:
+        root = os.path.join(ROOT, name)
 
     if not os.path.isdir(root):
         os.mkdir(root)
@@ -50,11 +71,11 @@ def init():
         if not os.path.isdir(folderpath):
             os.mkdir(folderpath)
             created.append(folderpath)
-    
+
     for file_name in NEW_BLANK_FILES:
         filepath = os.path.join(root, file_name)
         if not os.path.isfile(filepath):
-            with open(filepath, 'w') as f:
+            with open(filepath, "w") as f:
                 f.write("")
             created.append(filepath)
         else:
@@ -62,20 +83,14 @@ def init():
 
     manifest = os.path.join(root, MANIFEST_FILE)
     if not os.path.isfile(manifest):
-        with open(manifest, 'w') as f:
+        with open(manifest, "w") as f:
             json.dump(
-                {
-                    "name": name,
-                    "manifest_version": 2,
-                    "version": "0.1.0"
-                }, f, indent=2
+                {"name": name, "manifest_version": 2, "version": "0.1.0"}, f, indent=2
             )
         created.append(manifest)
     else:
         prompt_overwrite(manifest)
 
     if len(created) > 0:
-        print(FILES_CREATED + f"\n".join([dir for dir in created]), 
-            file=sys.stdout
-        )
+        print(FILES_CREATED + f"\n".join([dir for dir in created]), file=sys.stdout)
     print(TASK_COMPLETED)
