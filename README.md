@@ -2,6 +2,7 @@
 
 ## Usage
 ### Prompt for a file name that will create a project folder in the current working directory.
-```
-chromie init
-```
+`chromie init . -n my_chrome_extension`
+
+### Create a zip file containing all folders in the project directory not listed in a .zipignore file.
+`chromie package .`

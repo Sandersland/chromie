@@ -1,96 +1,62 @@
 import os
 import sys
 import json
+import shutil
+
+from chromie.utils import ChromiePathFinder
 
 
-ROOT = os.path.abspath(os.getcwd())
-NEW_DIRS = (
-    "dist",
-    "images",
-    "images/web store",
-)
-NEW_BLANK_FILES = (
-    ".gitignore",
-    ".zipignore",
-)
-MANIFEST_FILE = "manifest.json"
 NAME_PROMPT = "What is the name of your project?\nname: "
-OVERWRITE_PROMPT = (
-    "This file or directory {} already exists.\nType (Y)es to overwrite. "
+OVERWRIGHT_PROMPT = (
+    "This directory with this name already exists.\n"
+    "Would you like to overwrite anyway? Y/N: "
 )
 AFFERMATIVE = (
     "Y",
     "YES",
 )
-NEGATIVE = ("N", "NO")
-TASK_COMPLETED = "Job completed."
-TASK_ABORTED = "Job aborted."
-FILES_CREATED = "The following files or directories were created:\n"
-
-
-def prompt_overwrite(path):
-    # TODO: prevent this if -y is in argv
-    # TODO: make wrapper for this instead
-    repeat = 0
-    overwrite = input(OVERWRITE_PROMPT.format(path)).upper()
-    repeat += 1
-    try:
-        while overwrite not in (*AFFERMATIVE, *NEGATIVE) or repeat <= 3:
-            if overwrite in NEGATIVE:
-                raise SystemExit(TASK_ABORTED)
-            elif overwrite in AFFERMATIVE:
-                break
-            else:
-                overwrite = input(OVERWRITE_PROMPT.format(path)).upper()
-                repeat += 1
-    except KeyboardInterrupt as e:
-        raise SystemExit(e)
+NEGATIVE = (
+    "N",
+    "NO",
+)
 
 
 def init(args):
-    created = []
 
-    if args.name:
-        name = args.name
+    name = args.name if args.name else input(NAME_PROMPT)
+    exist_ok = args.overwrite
+
+    finder = ChromiePathFinder(args.filepath, name)
+
+    if not exist_ok and os.path.exists(finder.root):
+        asked = 0
+        overwrite_prompt = ""
+        while asked <= 3 or overwrite_prompt not in [*AFFERMATIVE, *NEGATIVE]:
+            overwrite_prompt = input(OVERWRIGHT_PROMPT).upper()
+            asked += 1
+            if overwrite_prompt in NEGATIVE or asked >= 3:
+                raise SystemExit()
+
+            elif overwrite_prompt in AFFERMATIVE:
+                shutil.rmtree(finder.root, ignore_errors=True)
+                break
     else:
-        name = input(NAME_PROMPT)
+        shutil.rmtree(finder.root, ignore_errors=True)
 
-    if args.filepath:
-        filepath = os.path.abspath(args.filepath)
-        root = os.path.join(filepath, name)
-        print(root)
-    else:
-        root = os.path.join(ROOT, name)
+    if not os.path.exists(finder.root):
 
-    if not os.path.isdir(root):
-        os.mkdir(root)
-        created.append(root)
+        # creates deepest directories
+        # os.makedirs(finder('web_store'))
+        os.makedirs(finder("web_store"))
+        os.makedirs(finder("images"))
 
-    for folder_name in NEW_DIRS:
-        folderpath = os.path.join(root, folder_name)
-        if not os.path.isdir(folderpath):
-            os.mkdir(folderpath)
-            created.append(folderpath)
+        with open(finder("gitignore"), "w") as f:
+            f.write("")
 
-    for file_name in NEW_BLANK_FILES:
-        filepath = os.path.join(root, file_name)
-        if not os.path.isfile(filepath):
-            with open(filepath, "w") as f:
-                f.write("")
-            created.append(filepath)
-        else:
-            prompt_overwrite(filepath)
+        with open(finder("zipignore"), "w") as f:
+            f.writelines(f"\n".join((".zipignore", "dist")))
 
-    manifest = os.path.join(root, MANIFEST_FILE)
-    if not os.path.isfile(manifest):
-        with open(manifest, "w") as f:
+        with open(finder("manifest"), "w") as f:
             json.dump(
                 {"name": name, "manifest_version": 2, "version": "0.1.0"}, f, indent=2
             )
-        created.append(manifest)
-    else:
-        prompt_overwrite(manifest)
-
-    if len(created) > 0:
-        print(FILES_CREATED + f"\n".join([dir for dir in created]), file=sys.stdout)
-    print(TASK_COMPLETED)

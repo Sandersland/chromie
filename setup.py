@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="chromie",
-    version="0.0.3",
+    version="0.0.32",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Sandersland/chromie",

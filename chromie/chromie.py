@@ -1,24 +1,37 @@
 import argparse
 
-from chromie.commands import init, package
-
+from chromie.commands import init, package, preview
 
 parser = argparse.ArgumentParser(prog="chromie")
 
-subparsers = parser.add_subparsers(help="commands", dest="command")
+subparsers = parser.add_subparsers(help="desired command to perform", dest="command")
 
-init_parser = subparsers.add_parser("init", help="initialize project directory")
-
-init_parser.add_argument(
-    "-f", "--filepath", help="project directory", action="store", type=str
+parent_parser = argparse.ArgumentParser(add_help=False)
+parent_parser.add_argument(
+    "filepath", help="project directory", action="store", type=str
 )
 
-init_parser.add_argument("-n", "--name", help="Project name", action="store", type=str)
+init_parser = subparsers.add_parser(
+    "init", parents=[parent_parser], help="initialize project directory"
+)
 
-package_parser = subparsers.add_parser("package", help="package project directory")
+init_parser.add_argument(
+    "-n", "--name", help="specify the project name", action="store", type=str
+)
 
-package_parser.add_argument(
-    "-f", "--filepath", help="project directory", action="store", type=str
+init_parser.add_argument(
+    "-o",
+    "--overwrite",
+    help="overwrite files if directory already exists",
+    action="store_true",
+)
+
+package_parser = subparsers.add_parser(
+    "package", parents=[parent_parser], help="package project directory"
+)
+
+preview_parser = subparsers.add_parser(
+    "preview", parents=[parent_parser], help="preview project in browser"
 )
 
 
@@ -26,17 +39,17 @@ def main():
 
     args = parser.parse_args()
 
-    if not args:
-        raise SystemExit()
-
-    elif args.command == "init":
+    if args.command == "init":
         init(args)
 
     elif args.command == "package":
         package(args)
 
+    elif args.command == "preview":
+        preview(args)
+
     else:
-        raise SystemExit()
+        parser.print_help()
 
 
 if __name__ == "__main__":

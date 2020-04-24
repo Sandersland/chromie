@@ -4,3 +4,5 @@ venv
 build/
 dist/
 __pycache__/
+secrets.json
+.DS_Store
