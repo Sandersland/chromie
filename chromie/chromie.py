@@ -3,9 +3,9 @@ import sys
 
 from chromie.commands import init, package, preview
 
+parser = argparse.ArgumentParser(prog="chromie")
 
 def parse_args(args):
-    parser = argparse.ArgumentParser(prog="chromie")
 
     subparsers = parser.add_subparsers(
         help="desired command to perform", dest="command"

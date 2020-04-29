@@ -1,12 +1,13 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
     name="chromie",
-    version="0.1.0",
+    version="0.1.1",
     long_description=long_description,
+    packages=find_packages(),
     long_description_content_type="text/markdown",
     url="https://github.com/Sandersland/chromie",
     author="Steffen Andersland",
