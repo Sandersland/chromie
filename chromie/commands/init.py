@@ -3,7 +3,7 @@ import sys
 import json
 import shutil
 
-from chromie.utils import ChromiePathFinder
+from chromie.utils import ChromiePathFinder, ManifestFile
 
 
 NAME_PROMPT = "What is the name of your project?\nname: "
@@ -45,8 +45,6 @@ def init(args):
 
     if not os.path.exists(finder.root):
 
-        # creates deepest directories
-        # os.makedirs(finder('web_store'))
         os.makedirs(finder("web_store"))
         os.makedirs(finder("images"))
 
@@ -56,7 +54,7 @@ def init(args):
         with open(finder("zipignore"), "w") as f:
             f.writelines(f"\n".join((".zipignore", "dist")))
 
-        with open(finder("manifest"), "w") as f:
-            json.dump(
-                {"name": name, "manifest_version": 2, "version": "0.1.0"}, f, indent=2
-            )
+        ManifestFile(
+            finder("manifest"),
+            {"name": name, "manifest_version": 2, "version": "0.1.0"},
+        ).write()

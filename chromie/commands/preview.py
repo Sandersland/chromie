@@ -1,6 +1,8 @@
 import subprocess
 import os
 
+from chromie.utils import ChromiePathFinder
+
 
 def find_chrome():
     chrome = "Google Chrome.app"
@@ -19,7 +21,14 @@ def find_chrome():
 
 
 def preview(args):
-    chrome = find_chrome()
-    subprocess.call(
-        [f"{chrome}/Contents/MacOS/Google Chrome", f"--load-extension{args.filepath}"]
-    )
+    finder = ChromiePathFinder(args.filepath)
+    try:
+        chrome = find_chrome()
+        subprocess.call(
+            [
+                f"{chrome}/Contents/MacOS/Google Chrome",
+                f'--load-extension={finder("src")}',
+            ]
+        )
+    except KeyboardInterrupt as e:
+        exit()
