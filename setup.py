@@ -14,5 +14,5 @@ setup(
     author_email="stefandersland@gmail.com",
     license="MIT",
     extras_require={"dev": ["twine"]},
-    entry_points={"console_scripts": ["chromie=chromie.chromie:main"]},
+    entry_points={"console_scripts": ["chromie=chromie:main"]},
 )
