@@ -5,6 +5,7 @@ from chromie.commands import init, package, preview
 
 parser = argparse.ArgumentParser(prog="chromie")
 
+
 def parse_args(args):
 
     subparsers = parser.add_subparsers(
@@ -32,7 +33,7 @@ def parse_args(args):
     )
 
     package_parser = subparsers.add_parser(
-        "package", parents=[parent_parser], help="package project directory"
+        "pack", parents=[parent_parser], help="package project directory"
     )
 
     package_parser.add_argument(
@@ -55,7 +56,7 @@ def main():
     if args.command == "init":
         init(args)
 
-    elif args.command == "package":
+    elif args.command == "pack":
         package(args)
 
     elif args.command == "preview":
