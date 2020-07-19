@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="chromie",
-    version="0.1.2",
+    version="0.1.3",
     long_description=long_description,
     packages=find_packages(),
     long_description_content_type="text/markdown",
