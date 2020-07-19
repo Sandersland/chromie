@@ -5,7 +5,7 @@
 `chromie init . -n my_chrome_extension`
 
 ### Create a zip file containing all folders in the project directory not listed in a .zipignore file.
-`chromie package .`
+`chromie pack .`
 
 ### Incriment manifest version number based on [semantic versioning specification](https://semver.org/).
 `chromie package . -i major`
