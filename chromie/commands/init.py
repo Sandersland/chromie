@@ -52,9 +52,10 @@ def init(args):
             f.write("")
 
         with open(finder("zipignore"), "w") as f:
-            f.writelines(f"\n".join((".zipignore", "dist")))
+            # f.writelines(f"\n".join((".zipignore", "dist")))
+            f.write("")
 
         ManifestFile(
             finder("manifest"),
-            {"name": name, "manifest_version": 2, "version": "0.1.0"},
+            {"name": name, "manifest_version": 2, "version": "0.0.0"},
         ).write()

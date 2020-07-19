@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from fnmatch import fnmatch
+from glob import glob
 import zipfile
 
 from chromie.utils import ChromiePathFinder, ManifestFile
@@ -20,6 +20,29 @@ def is_valid_version_arg(increment_version):
     return False
 
 
+def write_zip(zip, fp, root, name):
+    absname = os.path.abspath(os.path.join(root, name))
+    arcname = f"{fp.split('/')[-1]}/{name}"
+    zip.write(absname, arcname)
+
+
+def do_pack(fp, src, target, ignore_paths=None):
+    ignore_paths = [] if not ignore_paths else ignore_paths
+
+    with zipfile.ZipFile(target, "w", zipfile.ZIP_STORED) as zip:
+        for dirname, subdirs, files in os.walk(src):
+            [
+                write_zip(zip, fp, dirname, fn)
+                for fn in files
+                if os.path.join(dirname, fn) not in ignore_paths
+            ]
+            [
+                write_zip(zip, fp, dirname, dn)
+                for dn in subdirs
+                if os.path.join(dirname, dn) not in ignore_paths
+            ]
+
+
 def package(args):
     # TODO: impliment --version -v argument for setting the version in manifest.json
 
@@ -33,33 +56,26 @@ def package(args):
         raise SystemExit(INVALID_VERSION_ARGUMENT)
 
     finder = ChromiePathFinder(filepath)
-    manifest = ManifestFile.from_file(finder("manifest"))
-    manifest.increment_version(increment_version)
 
-    zipignore_file = finder("zipignore")
-    ignore = [".gitignore", "dist", ".DS_Store"]
+    manifest_file = ManifestFile.from_file(finder("manifest"))
+
+    manifest_file.increment_version(increment_version)
 
     dist = finder("dist")
     if not os.path.isdir(dist):
         os.mkdir(dist)
 
-    directory = os.listdir(filepath)
+    src = finder("src")
+    with open(finder("zipignore"), "r") as zipignore:
+        ignore_paths = [
+            name
+            for pattern in [line.rstrip() for line in zipignore.readlines()]
+            for name in glob(os.path.join(filepath, src, pattern))
+        ]
 
-    with open(zipignore_file, "r") as zipignore:
-        lines = [line.rstrip() for line in zipignore.readlines()]
-        [ignore.append(n) for n in directory for l in lines if fnmatch(n, l)]
-
-    with zipfile.ZipFile(
-        os.path.join(dist, f"{finder.name}.zip"), "w", zipfile.ZIP_DEFLATED
-    ) as zip:
-
-        def write_zip(fp, root, name):
-            absname = os.path.abspath(os.path.join(root, name))
-            arcname = absname[len(fp) + 1 :]
-            zip.write(absname, arcname)
-
-        for item in directory:
-            if item not in ignore:
-                for dirname, subdirs, files in os.walk(os.path.join(filepath, item)):
-                    [write_zip(filepath, dirname, fn) for fn in files]
-                    [write_zip(filepath, dirname, d) for d in subdirs]
+        do_pack(
+            filepath,
+            os.path.join(filepath, src),
+            os.path.join(dist, f"{finder.name}.zip"),
+            ignore_paths,
+        )
