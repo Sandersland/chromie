@@ -22,7 +22,7 @@ def is_valid_version_arg(increment_version):
 
 def write_zip(zip, fp, root, name):
     path = os.path.abspath(os.path.join(root, name))
-    zip.write(absname, os.path.basename(path))
+    zip.write(path, os.path.basename(path))
 
 
 def do_pack(fp, src, target, ignore_paths=None):
