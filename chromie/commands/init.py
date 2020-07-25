@@ -1,7 +1,5 @@
-import os
-import sys
-import json
 import shutil
+import os
 
 from chromie.utils import ChromiePathFinder, ManifestFile
 

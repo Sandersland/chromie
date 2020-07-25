@@ -6,7 +6,7 @@ from chromie.commands import init, package, preview
 parser = argparse.ArgumentParser(prog="chromie")
 
 
-def parse_args(args):
+def parse_args(argv):
 
     subparsers = parser.add_subparsers(
         help="desired command to perform", dest="command"
@@ -46,12 +46,13 @@ def parse_args(args):
     preview_parser = subparsers.add_parser(
         "preview", parents=[parent_parser], help="preview project in browser"
     )
-    return parser.parse_args(args)
+    return parser.parse_args(argv[1:])
 
 
-def main():
-
-    args = parse_args(sys.argv[1:])
+def main(argv=None):
+    argv = sys.argv if not argv else argv
+        
+    args = parse_args(argv)
 
     if args.command == "init":
         init(args)
@@ -65,6 +66,8 @@ def main():
     else:
         parser.print_help()
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv))

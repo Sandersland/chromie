@@ -1,6 +1,4 @@
 import os
-import sys
-import json
 from glob import glob
 import zipfile
 
