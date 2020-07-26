@@ -48,24 +48,31 @@ class ManifestFile:
         data = self.data if not data else data
         with open(self.path, "w") as f:
             json.dump(data, f, indent=2)
+        return True
 
-    def increment_version(self, vers):
+    def increment_version(self, increment_name):
 
         current_version = self.data["version"]
 
         major, minor, patch = current_version.split(".")
 
-        if vers == "major":
+        if increment_name == "major":
             major = str(int(major) + 1)
 
-        elif vers == "minor":
+        elif increment_name == "minor":
             minor = str(int(minor) + 1)
 
-        elif vers == "patch":
+        elif increment_name == "patch":
             patch = str(int(patch) + 1)
 
         new_version = ".".join((major, minor, patch))
 
         self.data["version"] = current_version.replace(current_version, new_version)
 
-        self.write()
+        return self.write()
+
+    def set_version(self, version):
+        current_version = self.data["version"]
+
+        self.data["version"] = current_version.replace(current_version, version)
+        return self.write()

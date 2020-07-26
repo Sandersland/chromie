@@ -1,4 +1,5 @@
 import os
+import re
 from glob import glob
 import zipfile
 
@@ -8,19 +9,26 @@ VERSION_PROMPT = "How would you like to increment the version?\nOptions are eith
 INVALID_VERSION_ARGUMENT = (
     "Incorrect version was entered. Please enter either 'major', 'minor' or 'patch'."
 )
+INVALID_VERSION_PATTERN = (
+    "The version provided was not valid. Please see https://semver.org/ for help."
+)
 NO_DIST_FOUND = "No dist directory was found in the directory specified."
 ZIP_SUCCESSFUL = "{} was packaged successfully!"
 
 
-def is_valid_version_arg(increment_version):
+def is_valid_increment_version(increment_version):
     if increment_version and increment_version.lower() in ("minor", "major", "patch"):
         return True
     return False
 
+def is_valid_version(version):
+    pattern = re.compile(r"^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$")
+    return True if version and pattern.match(version) else False
+        
 
 def write_zip(zip, fp, root, name):
     path = os.path.abspath(os.path.join(root, name))
-    if os.name == 'posix':
+    if os.name == "posix":
         arcname = f"{fp.split('/')[-1]}/{name}"
         zip.write(path, arcname)
     else:
@@ -45,22 +53,27 @@ def do_pack(fp, src, target, ignore_paths=None):
 
 
 def package(args):
-    # TODO: impliment --version -v argument for setting the version in manifest.json
 
     filepath = os.path.abspath(args.filepath)
     increment_version = args.increment_version
+    version = args.version
 
-    if not increment_version:
+    if not version and not increment_version:
         increment_version = input(VERSION_PROMPT)
-
-    if not is_valid_version_arg(increment_version):
-        raise SystemExit(INVALID_VERSION_ARGUMENT)
 
     finder = ChromiePathFinder(filepath)
 
     manifest_file = ManifestFile.from_file(finder("manifest"))
 
-    manifest_file.increment_version(increment_version)
+    if increment_version and not version:
+        if not is_valid_increment_version(increment_version):
+            raise SystemExit(INVALID_VERSION_ARGUMENT)
+        manifest_file.increment_version(increment_version)
+
+    elif version and not increment_version:
+        if not is_valid_version(version):
+            raise SystemExit(INVALID_VERSION_PATTERN)
+        manifest_file.set_version(version)
 
     dist = finder("dist")
     if not os.path.isdir(dist):
