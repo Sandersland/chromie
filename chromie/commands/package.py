@@ -21,10 +21,13 @@ def is_valid_increment_version(increment_version):
         return True
     return False
 
+
 def is_valid_version(version):
-    pattern = re.compile(r"^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$")
+    pattern = re.compile(
+        r"^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$"
+    )
     return True if version and pattern.match(version) else False
-        
+
 
 def write_zip(zip, fp, root, name):
     path = os.path.abspath(os.path.join(root, name))

@@ -17,7 +17,7 @@ def main(argv=None):
         preview(args)
 
     else:
-        parser.print_help()
+        raise SystemExit
 
     return 0
 
