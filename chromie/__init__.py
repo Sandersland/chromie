@@ -1,20 +1,20 @@
 import sys
 
 from chromie.parser import parse_args
-from chromie.commands import init, package, preview
+from chromie.commands import do_init, do_pack, do_preview
 
 
 def main(argv=None):
     args = parse_args(argv)
 
     if args.command == "init":
-        init(args)
+        do_init(args)
 
     elif args.command == "pack":
-        package(args)
+        do_pack(args)
 
     elif args.command == "preview":
-        preview(args)
+        do_preview(args)
 
     else:
         raise SystemExit

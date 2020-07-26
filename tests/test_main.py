@@ -15,7 +15,7 @@ class TestMain(unittest.TestCase):
         with self.assertRaises(SystemExit):
             main(["init"])
 
-    @patch("chromie.init")
+    @patch("chromie.do_init")
     def test_init(self, init):
         cmd = "chromie init . -n testy"
         argv = ParserHelper.get_argv(cmd)
@@ -30,7 +30,7 @@ class TestMain(unittest.TestCase):
         with self.assertRaises(SystemExit):
             main(["pack"])
 
-    @patch("chromie.package")
+    @patch("chromie.do_pack")
     def test_pack(self, package):
         cmd = "chromie pack ./testy"
         argv = ParserHelper.get_argv(cmd)

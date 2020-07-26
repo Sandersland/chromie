@@ -19,14 +19,32 @@ NEGATIVE = (
 )
 
 
+def make_extension_dir(finder):
+
+    os.makedirs(finder("web_store"))
+    os.makedirs(finder("images"))
+
+    with open(finder("gitignore"), "w") as f:
+        f.write("")
+
+    with open(finder("zipignore"), "w") as f:
+        # f.writelines(f"\n".join((".zipignore", "dist")))
+        f.write("")
+
+    ManifestFile(
+        finder("manifest"),
+        {"name": finder.name, "manifest_version": 2, "version": "0.0.0"},
+    ).write()
+
+
 def init(args):
 
     name = args.name if args.name else input(NAME_PROMPT)
-    exist_ok = args.overwrite
+    overwrite = args.overwrite
 
     finder = ChromiePathFinder(args.filepath, name)
 
-    if not exist_ok and os.path.exists(finder.root):
+    if not overwrite and finder.exists() == True:
         asked = 0
         overwrite_prompt = ""
         while asked <= 3 or overwrite_prompt not in [*AFFERMATIVE, *NEGATIVE]:
@@ -38,22 +56,9 @@ def init(args):
             elif overwrite_prompt in AFFERMATIVE:
                 shutil.rmtree(finder.root, ignore_errors=True)
                 break
-    else:
+
+    elif overwrite == True:
         shutil.rmtree(finder.root, ignore_errors=True)
 
-    if not os.path.exists(finder.root):
-
-        os.makedirs(finder("web_store"))
-        os.makedirs(finder("images"))
-
-        with open(finder("gitignore"), "w") as f:
-            f.write("")
-
-        with open(finder("zipignore"), "w") as f:
-            # f.writelines(f"\n".join((".zipignore", "dist")))
-            f.write("")
-
-        ManifestFile(
-            finder("manifest"),
-            {"name": name, "manifest_version": 2, "version": "0.0.0"},
-        ).write()
+    if not finder.exists(finder.root):
+        make_extension_dir(finder)
