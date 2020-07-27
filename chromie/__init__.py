@@ -17,7 +17,7 @@ def main(argv=None):
         do_preview(args)
 
     else:
-        raise SystemExit
+        raise SystemExit("No command selected, for help enter: chromie --help")
 
     return 0
 
