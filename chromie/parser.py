@@ -1,8 +1,14 @@
 import argparse
 
+from chromie import __version__
+
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(prog="chromie")
+
+    parser.add_argument(
+        '-v', '--version', action="version", version=f"chromie-{__version__}"
+    )
 
     subparsers = parser.add_subparsers(
         help="desired command to perform", dest="command"

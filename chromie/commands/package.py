@@ -38,7 +38,7 @@ def write_zip(zip, fp, root, name):
         zip.write(path, os.path.basename(path))
 
 
-def do_pack(fp, src, target, ignore_paths=None):
+def package_directory(fp, src, target, ignore_paths=None):
     ignore_paths = [] if not ignore_paths else ignore_paths
 
     with zipfile.ZipFile(target, "w", zipfile.ZIP_STORED) as zip:
@@ -71,7 +71,7 @@ def package(args):
     if increment_version and not version:
         if not is_valid_increment_version(increment_version):
             raise SystemExit(INVALID_VERSION_ARGUMENT)
-        manifest_file.increment_version(increment_version)
+        version = manifest_file.increment_version(increment_version)
 
     elif version and not increment_version:
         if not is_valid_version(version):
@@ -90,9 +90,9 @@ def package(args):
             for name in glob(os.path.join(filepath, src, pattern))
         ]
 
-        do_pack(
+        package_directory(
             filepath,
             os.path.join(filepath, src),
-            os.path.join(dist, f"{finder.name}.zip"),
+            os.path.join(dist, f"{finder.name}-{version}.zip"),
             ignore_paths,
         )

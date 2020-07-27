@@ -73,10 +73,12 @@ class ManifestFile:
 
         self.data["version"] = current_version.replace(current_version, new_version)
 
-        return self.write()
+        self.write()
+        return new_version
 
     def set_version(self, version):
         current_version = self.data["version"]
 
         self.data["version"] = current_version.replace(current_version, version)
-        return self.write()
+        self.write()
+        return version
