@@ -33,7 +33,7 @@ class ChromiePathFinder(dict):
         return os.path.abspath(os.path.join(self.root, dir))
 
     def exists(self, name=""):
-        path = os.path.abspath(os.path.join(self.path, name))
+        path = os.path.abspath(os.path.join(self.root, name))
         return os.path.exists(path)
 
 
