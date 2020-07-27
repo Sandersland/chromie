@@ -1,5 +1,9 @@
 # Chromie
 
+## Installation
+### PyPI
+`py -m pip install chromie`
+
 ## Usage
 ### Prompt for a file name that will create a project folder in the current working directory.
 `chromie init . -n my_chrome_extension`
@@ -8,7 +12,7 @@
 `chromie pack .`
 
 ### Increment manifest version number based on [semantic versioning specification](https://semver.org/).
-`chromie package . -i major`
+`chromie pack . -i major`
 
-### Preview chrome extension in browser -- Currently only available for macOS and requires that you don't already have a running chrome session.
-`chromie preview .`
+### Explicitly set manifest version number based on [semantic versioning specification](https://semver.org/).
+`chromie pack . -v 1.0.0`
