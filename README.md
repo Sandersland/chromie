@@ -1,4 +1,5 @@
-# Chromie
+# chromie
+A simple utility CLI for packaging chrome extensions
 
 ## Installation
 `py -m pip install chromie`
