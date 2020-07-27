@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-from chromie import *
+from chromie import __version__, __author__, __email__, __license__
 
 
 with open("README.md", "r") as fh:
