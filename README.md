@@ -1,11 +1,11 @@
 # chromie
-A simple utility CLI for packaging chrome extensions
+A simple utility CLI for packaging chrome extensions.
 
 ## Installation
 `py -m pip install chromie`
 
 ## Usage
-### Prompt for a file name that will create a project folder in the current working directory.
+### Create a project folder within a specific directory.
 `chromie init . -n my_chrome_extension`
 
 ### Create a zip file containing all folders in the project directory not listed in a .zipignore file.
