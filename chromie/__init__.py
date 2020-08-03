@@ -1,5 +1,5 @@
 __author__ = "Steffen Andersland"
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 __license__ = "MIT"
 __email__ = "stefandersland@gmial.com"
 

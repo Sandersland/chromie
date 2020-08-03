@@ -16,6 +16,6 @@ setup(
     author=__author__,
     author_email=__email__,
     license=__license__,
-    extras_require={"dev": ["twine"]},
+    extras_require={"dev": ["twine", "black"]},
     entry_points={"console_scripts": ["chromie=chromie:main"]},
 )
