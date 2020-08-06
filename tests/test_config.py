@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from chromie import config
 
+
 class TestConfig(unittest.TestCase):
     def test_from_file(self):
         pass
