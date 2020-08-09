@@ -1,180 +1,120 @@
 from __future__ import annotations
 from typing import Dict
-from urllib.parse import urljoin
-import json
-import time
+from json.decoder import JSONDecodeError
 
-import jwt
 import requests
 
-
-class AuthenticationError(Exception):
-    pass
+from chromie.auth import BaseServiceAuth
 
 
 class GoogleWebStoreError(Exception):
     pass
 
 
-class BaseServiceAuth:
-    TOKEN_URI = "https://oauth2.googleapis.com/token"
-    SCOPES = []
-
-    def __init__(self, credentials=None):
-        self._creds = credentials if credentials else {}
-        self.token = None
-
-    def set_token(self, email: str):
-        data = {
-            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            "assertion": self._encode_web_token(email),
-        }
-        response = requests.post(
-            self.TOKEN_URI,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-            data=data,
-        )
-        self.token = response.json()
-        return self.token
-
-    def _encode_web_token(self, email: str):
-        try:
-            iat = round(time.time())
-            exp = iat + 60
-            payload = {
-                "iss": self._creds.get("client_email", None),
-                "sub": email,
-                "scope": " ".join(self.SCOPES) if len(self.SCOPES) > 0 else "",
-                "aud": self.TOKEN_URI,
-                "exp": exp,
-                "iat": iat,
-            }
-            return jwt.encode(
-                payload, self._creds.get("private_key", None), algorithm="RS256"
-            )
-        except TypeError as e:
-            raise AuthenticationError(e)
-
-    def set_credentials(self, **kwargs):
-        for k, v in kwargs.items():
-            self._creds[k] = v
-
-
 class GoogleWebStoreAuthentication(BaseServiceAuth):
-    SCOPES = [
-        "https://www.googleapis.com/auth/chromewebstore"
-    ]
+    SCOPES = ["https://www.googleapis.com/auth/chromewebstore"]
 
 
 class GoogleWebStore:
     UPLOAD_URI = "https://www.googleapis.com/upload/chromewebstore/v1.1/items"
     METADATA_URI = "https://www.googleapis.com/chromewebstore/v1.1/items"
 
-    def __init__(self) -> GoogleWebStore:
-        self.token = None
+    def __init__(
+        self, token: Dict[str, str] = None, session: requests.Session = None
+    ) -> GoogleWebStore:
+        self.token = token
+        self._request_session = session if session else requests.Session()
 
     @staticmethod
-    def session(email, credentials):
+    def session(email: str, credentials: Dict[str, str]) -> GoogleWebStoreSession:
         return GoogleWebStoreSession(email, credentials)
 
-    def authenticate(self, email, credentials) -> None:
+    def authenticate(self, email: str, credentials: Dict[str, str]) -> None:
         auth = GoogleWebStoreAuthentication()
         auth.set_credentials(**credentials)
-        self.token = auth.set_token(email)
+        self.token = auth.get_token(email)
         return None
 
-    def _handle_response(self, response: requests.Response):
+    def _make_request(self, request: requests.PreparedRequest) -> requests.Response:
+        return self._request_session.send(request)
 
-    def upload(self, filepath: str) -> None:
+    def _build_request(
+        self, method: str, url: str, fp: str = None
+    ) -> requests.PreparedRequest:
+        request = requests.Request(method=method, url=url)
+        headers = {
+            "Authorization": "Bearer {}".format(self.token),
+            "x-goog-api-version": "2",
+        }
+        if fp:
+            with open(fp, "rb") as file:
+                request.data = file.read()
+                request.params = {"file": fp}
+                headers["Accept-Encoding"] = "gzip, deflate"
+        request.headers = headers
+        return request.prepare()
 
-        with open(filepath, "rb") as fh:
-            response = requests.post(
-                self.UPLOAD_URI,
-                headers={
-                    "Authorization": "Bearer %s" % self.token.get("access_token"),
-                    "x-goog-api-version": "2",
-                    "Accept-Encoding": "gzip, deflate",
-                },
-                data=fh.read(),
-                params={"file": filepath},
-            )
-            if not response.ok:
-                message = response.json().get("error").get("message")
-                raise GoogleWebStoreError(
-                    "error uploading extension:\n" + message
-                )
-
-    def publish(self, id: str) -> None:
-        response = requests.post(
-            "/".join([self.METADATA_URI, id, "publish"]),
-            headers={
-                "Authorization": "Bearer %s" % self.token.get("access_token"),
-                "x-goog-api-version": "2",
-                "Accept-Encoding": "gzip, deflate"
-            },
-        )
-        if not response.ok:
-            try:
-                data = response.json()
-                errors = data.get("error").get("message").split(";")
-                raise GoogleWebStoreError(
-                    "error publishing extension:\n" + "\n".join(errors)
-                )
-            except json.decoder.JSONDecodeError as e:
-                print(response.text)
-            
-    def update(self, id: str, filepath: str) -> None:
-
-        with open(filepath, "rb") as fh:
-            response = requests.put(
-                "/".join([self.UPLOAD_URI, id]),
-                headers={
-                    "Authorization": "Bearer %s" % self.token.get("access_token"),
-                    "x-goog-api-version": "2",
-                    "Accept-Encoding": "gzip, deflate",
-                },
-                data=fh.read(),
-                params={"file": filepath},
-            )
+    def _handle_response(self, response: requests.Response) -> str:
+        try:
             data = response.json()
             if not response.ok:
-                message = data.get("error").get("message")
-                raise GoogleWebStoreError(
-                    "error updating extension:\n" + message
+                errors = data.get("error").get("message").split(";")
+                if len(errors) == 1:
+                    raise GoogleWebStoreError(errors[0])
+                message = "\n  " + "\n  ".join(
+                    [
+                        f"{i}. {err.split(':')[1].strip()}"
+                        if ":" in err and "http" not in err
+                        else f"{i}. {err.strip()}"
+                        for i, err in enumerate(errors, 1)
+                    ]
                 )
-            if response.ok and data.get("uploadState") == "FAILURE":
+                raise GoogleWebStoreError(message)
+            elif response.ok and data.get("uploadState") == "FAILURE":
                 errors = data.get("itemError")
-                message = "\n".join([item['error_detail'] for item in errors])
-                raise GoogleWebStoreError(
-                    "error updating extension:\n" + message
+                message = f"\n" + "\n".join(
+                    [
+                        f"{i}. {err.get('error_detail')}"
+                        for i, err in enumerate(errors, 1)
+                    ]
                 )
+                raise GoogleWebStoreError(message)
+            elif response.ok and data.get("uploadState") == "SUCCESS":
+                return data.get("id")
+        except JSONDecodeError:
+            raise GoogleWebStoreError(response.text)
+
+    def upload(self, filepath: str) -> str:
+        request = self._build_request("POST", url=self.UPLOAD_URI, fp=filepath)
+        response = self._make_request(request)
+        return self._handle_response(response)
+
+    def publish(self, id: str) -> str:
+        url = "/".join([self.METADATA_URI, id, "publish"])
+        request = self._build_request(method="POST", url=url)
+        response = self._make_request(request)
+        return self._handle_response(response)
+
+    def update(self, id: str, filepath: str) -> str:
+        url = "/".join([self.UPLOAD_URI, id])
+        request = self._build_request(method="PUT", url=url, fp=filepath)
+        response = self._make_request(request)
+        return self._handle_response(response)
 
 
 class GoogleWebStoreSession:
-    def __init__(self, email: str, credentials: Dict[str, str]) -> GoogleWebStoreSession:
+    def __init__(
+        self, email: str, credentials: Dict[str, str], session: requests.Session = None
+    ) -> GoogleWebStoreSession:
         self.email = email
         self.credentials = credentials
+        self.session = session
         self.store = None
 
     def __enter__(self) -> GoogleWebStore:
-        self.store = GoogleWebStore()
+        self.store = GoogleWebStore(session=self.session)
         self.store.authenticate(self.email, self.credentials)
         return self.store
 
     def __exit__(self, *args):
         return None
-
-
-if __name__ == "__main__":
-
-    fp = "/Users/sandersland/dev/chromie/testy/dist/testy-0.0.2.zip"
-    with open("secrets.json", "r") as file:
-        SECRETS = json.load(file)
-
-    with GoogleWebStore.session(
-        "steffen@andersland.dev", credentials=SECRETS
-    ) as session:
-        session.update("kgbndodiiaglaldfniieoblnlpncelkp", fp)
-
-        # session.upload(fp)
-        # session.publish("kgbndodiiaglaldfniieoblnlpncelkp")
