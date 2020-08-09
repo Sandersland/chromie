@@ -45,8 +45,28 @@ def parse_args(argv=None):
         action="store",
     )
 
+    config_parser = subparsers.add_parser(
+        "config", parents=[parent_parser], help="manage config file"
+    )
+
+    config_parser.add_argument("name", action="store", type=str)
+
+    config_parser.add_argument("value", action="store", type=str)
+
     package_parser.add_argument(
         "-v", "--version", help="specify the version", action="store"
+    )
+
+    upload_parser = subparsers.add_parser(
+        "upload", parents=[parent_parser], help="upload project to web store"
+    )
+
+    update_parser = subparsers.add_parser(
+        "update", parents=[parent_parser], help="push updates to web store"
+    )
+
+    publish_parser = subparsers.add_parser(
+        "publish", parents=[parent_parser], help="publish to web store"
     )
 
     preview_parser = subparsers.add_parser(

@@ -12,8 +12,9 @@ class Config:
     @classmethod
     def from_file(self, fp):
         if not os.path.isfile(fp):
-            data = {}
-            return Config(fp, data)
+            with open(fp, "w") as f:
+                f.write("")
+            return Config(fp, {})
 
         file = open(fp, "r")
         try:
