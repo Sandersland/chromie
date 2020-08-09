@@ -17,5 +17,6 @@ setup(
     author_email=__email__,
     license=__license__,
     extras_require={"dev": ["twine", "black"]},
+    install_requires=["requests==2.24.0", "cryptography==3.0", "PyJWT==1.7.1"],
     entry_points={"console_scripts": ["chromie=chromie:main"]},
 )

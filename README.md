@@ -17,8 +17,6 @@ A simple utility CLI for packaging chrome extensions.
 ### Explicitly set manifest version number based on [semantic versioning specification](https://semver.org/).
 `chromie pack . -v 1.0.0`
 
-<<<<<<< HEAD
-=======
 ### Store key-value pairs to the .chromie/settings.json file.
 `chromie config . email steffen@andersland.dev`
 
@@ -32,7 +30,6 @@ This requires that the .chromie/settings.json file includes email, client_email,
 ### Publish chrome extension to the Google Web Store.
 `chromie publish .`
 
->>>>>>> feature__deploy
 ## License
 The MIT License (MIT)
 
