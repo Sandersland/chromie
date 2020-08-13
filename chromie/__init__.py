@@ -1,8 +1,3 @@
-__author__ = "Steffen Andersland"
-__version__ = "0.1.10"
-__license__ = "MIT"
-__email__ = "steffen@andersland.dev"
-
 import sys
 
 from chromie.parser import parse_args

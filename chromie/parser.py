@@ -1,6 +1,6 @@
 import argparse
 
-from chromie import __version__
+from chromie.__version__ import __version__
 
 
 def parse_args(argv=None):
