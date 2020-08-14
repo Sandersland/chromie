@@ -11,13 +11,9 @@ class TestMain(unittest.TestCase):
         with self.assertRaises(SystemExit):
             main([])
 
-    def test_init_missing_filepath(self):
-        with self.assertRaises(SystemExit):
-            main(["init"])
-
     @patch("chromie.do_init")
     def test_init(self, init):
-        cmd = "chromie init . -n testy"
+        cmd = "chromie init -n testy"
         argv = ParserHelper.get_argv(cmd)
         mocked_args = ParserHelper.parse_args(
             command="init", filepath=".", name="testy", overwrite=False
@@ -25,10 +21,6 @@ class TestMain(unittest.TestCase):
         main(argv)
 
         init.assert_called_with(mocked_args)
-
-    def test_pack_missing_filepath(self):
-        with self.assertRaises(SystemExit):
-            main(["pack"])
 
     @patch("chromie.do_pack")
     def test_pack(self, package):

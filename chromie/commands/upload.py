@@ -3,6 +3,8 @@ from zipfile import is_zipfile
 
 from chromie.config import Config
 from chromie.webstore import GoogleWebStore, GoogleWebStoreError
+from chromie.auth import AuthenticationError
+from chromie.commands.messages import Settings
 
 
 def get_latest_version(fp):
@@ -19,21 +21,20 @@ def upload(args):
     dot_chromie = os.path.join(root, ".chromie")
 
     if not os.path.isdir(dot_chromie):
-        SystemExit(
-            "Please create a '.chromie/settings.json' file within the root project directory"
-        )
+        raise SystemExit(Settings.MISSING)
 
     archive = get_latest_version(dist)
 
     config_file = Config.from_file(os.path.join(dot_chromie, "settings.json"))
-
-    with GoogleWebStore.session(
-        config_file.data["email"], credentials=config_file.data
-    ) as session:
-        try:
-            extension_id = session.upload(archive)
-            data = {"extension_id": extension_id}
-            config_file.set_values(**data)
-        except GoogleWebStoreError as e:
-            print(e)
-
+    try:
+        with GoogleWebStore.session(
+            config_file.data["email"], credentials=config_file.data
+        ) as session:
+            try:
+                extension_id = session.upload(archive)
+                data = {"extension_id": extension_id}
+                config_file.set_values(**data)
+            except GoogleWebStoreError as e:
+                print(e)
+    except AuthenticationError:
+        print(Settings.INVALID)

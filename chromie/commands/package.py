@@ -4,16 +4,7 @@ from glob import glob
 import zipfile
 
 from chromie.utils import ChromiePathFinder, ManifestFile
-
-VERSION_PROMPT = "How would you like to increment the version?\nOptions are either 'major', 'minor', or 'patch': "
-INVALID_VERSION_ARGUMENT = (
-    "Incorrect version was entered. Please enter either 'major', 'minor' or 'patch'."
-)
-INVALID_VERSION_PATTERN = (
-    "The version provided was not valid. Please see https://semver.org/ for help."
-)
-NO_DIST_FOUND = "No dist directory was found in the directory specified."
-ZIP_SUCCESSFUL = "{} was packaged successfully!"
+from chromie.commands.messages import Package
 
 
 def is_valid_increment_version(increment_version):
@@ -62,7 +53,7 @@ def package(args):
     version = args.version
 
     if not version and not increment_version:
-        increment_version = input(VERSION_PROMPT)
+        increment_version = input(Package.VERSION_PROMPT)
 
     finder = ChromiePathFinder(filepath)
 
@@ -70,12 +61,12 @@ def package(args):
 
     if increment_version and not version:
         if not is_valid_increment_version(increment_version):
-            raise SystemExit(INVALID_VERSION_ARGUMENT)
+            raise SystemExit(Package.INVALID_VERSION_ARGUMENT)
         version = manifest_file.increment_version(increment_version)
 
     elif version and not increment_version:
         if not is_valid_version(version):
-            raise SystemExit(INVALID_VERSION_PATTERN)
+            raise SystemExit(Package.INVALID_VERSION_PATTERN)
         manifest_file.set_version(version)
 
     dist = finder("dist")

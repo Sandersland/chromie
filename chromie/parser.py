@@ -16,7 +16,12 @@ def parse_args(argv=None):
 
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument(
-        "filepath", help="project directory", action="store", type=str
+        "filepath",
+        help="project directory",
+        nargs="?",
+        action="store",
+        type=str,
+        default=".",
     )
 
     init_parser = subparsers.add_parser(

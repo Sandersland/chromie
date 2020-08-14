@@ -13,4 +13,3 @@ def config(args):
     config_file = Config.from_file(os.path.join(filepath, ".chromie/settings.json"))
     data = {args.name: args.value}
     config_file.set_values(**data)
-
