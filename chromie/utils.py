@@ -1,32 +1,20 @@
-from enum import Enum
 import os
 import json
 
 
-class Paths(Enum):
-    gitignore = ".gitignore"
-    zipignore = ".zipignore"
-    dist = "dist/"
-    web_store = "dist/web store/"
-    src = "src/"
-    images = "src/images"
-    manifest = "src/manifest.json"
-
-
 class ChromiePathFinder(dict):
-    def __init__(self, path=os.getcwd(), name=None, paths=Paths):
+    def __init__(self, path=os.getcwd(), name=None):
         if not name:
-            path, name = os.path.split(path)
-        self.path = path
-        self.name = name
-        self.paths = paths
+            self.path, self.name = os.path.split(path)
+        else:
+            self.path = path
+            self.name = name
 
     @property
     def root(self):
         return os.path.join(self.path, self.name)
 
-    def __call__(self, name):
-        dir = Paths[name].value
+    def __call__(self, dir):
         if not dir:
             raise ValueError(f"No path with the name {name} exists")
         return os.path.abspath(os.path.join(self.root, dir))

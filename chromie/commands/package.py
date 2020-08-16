@@ -4,7 +4,7 @@ from glob import glob
 import zipfile
 
 from chromie.utils import ChromiePathFinder, ManifestFile
-from chromie.enum import Package
+from chromie.enum import Package, Path
 
 
 def is_valid_increment_version(increment_version):
@@ -57,7 +57,7 @@ def package(args):
 
     finder = ChromiePathFinder(filepath)
 
-    manifest_file = ManifestFile.from_file(finder("manifest"))
+    manifest_file = ManifestFile.from_file(finder(Path.MANIFEST_FILE))
 
     if increment_version and not version:
         if not is_valid_increment_version(increment_version):
@@ -69,12 +69,12 @@ def package(args):
             raise SystemExit(Package.INVALID_VERSION_PATTERN)
         manifest_file.set_version(version)
 
-    dist = finder("dist")
+    dist = finder(Path.DIST_DIR)
     if not os.path.isdir(dist):
         os.mkdir(dist)
 
-    src = finder("src")
-    with open(finder("zipignore"), "r") as zipignore:
+    src = finder(Path.SRC_DIR)
+    with open(finder(Path.IGNORE_FILE), "r") as zipignore:
         ignore_paths = [
             name
             for pattern in [line.rstrip() for line in zipignore.readlines()]
@@ -87,3 +87,7 @@ def package(args):
             os.path.join(dist, f"{finder.name}-{version}.zip"),
             ignore_paths,
         )
+
+
+if __name__ == "__main__":
+    print(Path.MANIFEST_FILE)

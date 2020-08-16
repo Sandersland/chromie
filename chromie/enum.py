@@ -1,3 +1,15 @@
+from enum import Enum
+
+
+class Path:
+    IGNORE_FILE = ".zipignore"
+    DIST_DIR = "dist/"
+    STORE_DIR = "dist/web store/"
+    SRC_DIR = "src/"
+    IMAGES_DIR = "src/images/"
+    MANIFEST_FILE = "src/manifest.json"
+
+
 class Settings:
     MISSING = "Please create a '.chromie/settings.json' file within the root project directory"
     INVALID = "There was an error authenticating. Please check that the credentials provided in '.chromie/settings.json are valid."

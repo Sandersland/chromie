@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, Command
 import os
 import sys
 
@@ -15,6 +15,22 @@ packages = ["chromie"]
 
 requires = ["requests>=2.24.0,<3", "cryptography>=3.0,<4", "PyJWT>=1.7.1,<2"]
 
+
+class Publish(Command):
+    description = "Publish to PyPI"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        os.system("python setup.py sdist bdist_wheel")
+        os.system("twine upload dist/* --skip-existing")
+
+
 setup(
     name=about["__title__"],
     version=about["__version__"],
@@ -29,15 +45,5 @@ setup(
     extras_require={"dev": ["twine", "black"]},
     install_requires=requires,
     entry_points={"console_scripts": ["chromie=chromie:main"]},
+    cmdclass={"publish": Publish},
 )
-
-if __name__ == "__main__":
-
-    if sys.argv[-1] == "test":
-        os.system("python -m unittest")
-
-    elif sys.argv[-1] == "publish":
-        os.system("python setup.py sdist bdist_wheel")
-        os.system("twine upload dist/* --skip-existing")
-
-    sys.exit()
