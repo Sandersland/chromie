@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 from chromie.commands.init import init
-from chromie.commands.messages import Initialize
+from chromie.enum import Initialize
 from chromie.utils import ChromiePathFinder
 from tests.utils import ParserHelper
 

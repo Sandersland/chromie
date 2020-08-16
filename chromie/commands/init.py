@@ -2,7 +2,7 @@ import shutil
 import os
 
 from chromie.utils import ChromiePathFinder, ManifestFile
-from chromie.commands.messages import Initialize
+from chromie.enum import Initialize
 
 
 def make_extension_dir(finder):

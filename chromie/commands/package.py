@@ -4,7 +4,7 @@ from glob import glob
 import zipfile
 
 from chromie.utils import ChromiePathFinder, ManifestFile
-from chromie.commands.messages import Package
+from chromie.enum import Package
 
 
 def is_valid_increment_version(increment_version):

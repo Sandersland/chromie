@@ -4,7 +4,7 @@ from zipfile import is_zipfile
 from chromie.config import Config
 from chromie.webstore import GoogleWebStore, GoogleWebStoreError
 from chromie.auth import AuthenticationError
-from chromie.commands.messages import Settings, Update
+from chromie.enum import Settings, Update
 
 
 def get_latest_version(fp):
