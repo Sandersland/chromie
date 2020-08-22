@@ -6,9 +6,11 @@ from chromie.enum import Initialize, Path
 
 
 def make_extension_dir(finder):
-
-    os.makedirs(finder(Path.STORE_DIR))
-    os.makedirs(finder(Path.IMAGES_DIR))
+    os.mkdir(finder.root)
+    os.mkdir(finder(Path.SRC_DIR))
+    os.mkdir(finder(Path.IMAGES_DIR))
+    os.mkdir(finder(Path.DIST_DIR))
+    os.mkdir(finder(Path.STORE_DIR))
 
     with open(finder(Path.IGNORE_FILE), "w") as f:
         f.write("")
