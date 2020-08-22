@@ -6,13 +6,8 @@ from chromie.enum import Initialize, Path
 
 
 def make_extension_dir(finder):
-    # os.mkdir(finder.root)
-    # os.mkdir(finder(Path.DIST_DIR))
-    # os.mkdir(finder(Path.SRC_DIR))
-    # os.mkdir(finder(Path.STORE_DIR))
-    # os.mkdir(finder(Path.IMAGES_DIR))
-    os.makedirs(finder(Path.IMAGES_DIR), exist_ok=True)
-    os.makedirs(finder(Path.STORE_DIR), exist_ok=True)
+    for d in [Path.DIST_DIR, Path.SRC_DIR, Path.STORE_DIR, Path.IMAGES_DIR]:
+        os.makedirs(os.path.join(finder.root, d))
 
     with open(finder(Path.IGNORE_FILE), "w") as f:
         f.write("")
@@ -29,6 +24,7 @@ def init(args):
     overwrite = args.overwrite
 
     finder = ChromiePathFinder(args.filepath, name)
+    print(finder.root)
 
     if not overwrite and finder.exists() == True:
         asked = 0
