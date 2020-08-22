@@ -10,7 +10,7 @@ class Config:
         self._data = data
 
     @classmethod
-    def from_file(cls, fp):
+    def from_file(self, fp):
         if not os.path.isfile(fp):
             with open(fp, "w") as f:
                 f.write("")
