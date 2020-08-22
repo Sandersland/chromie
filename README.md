@@ -1,34 +1,90 @@
-# chromie
-A simple utility CLI for packaging chrome extensions.
+<p align="center"><img src="https://user-images.githubusercontent.com/17189382/90958771-81935380-e464-11ea-8cfa-ecf8b608802e.png" width="200"/></p>
+
+<h3 align="center">CHROMIE</h3>
+<p align="center">A simple utility CLI for packaging and maintaining chrome extensions.</p>
 
 ## Installation
-`py -m pip install chromie`
+```bash
+pip install chromie
+```
 
 ## Usage
-### Create a project folder within a specific directory.
-`chromie init . -n my_chrome_extension`
+### Create an empty project within the cwd.
+```bash
+chromie init
+>> What is the name of your project?
+hello world
+```
 
-### Create a zip file containing all folders in the project directory not listed in a .zipignore file.
-`chromie pack .`
+results:
+```text
+hello world/
+├── dist/
+│   └── web store/
+├── src/
+│   ├── images/
+│   └── manifest.json
+├── .gitignore
+└── .zipignore
+```
+#### you can skip the prompt using the name flag
+`chromie init -n "hello world"`
 
-### Increment manifest version number based on [semantic versioning specification](https://semver.org/).
-`chromie pack . -i major`
+### Create a zip file containing all folders in the src directory excluding those listed in .zipignore.
+```bash
+cd hello world
+chromie pack
+>> How would you like to increment the version?
+>> Options are either 'major', 'minor', or 'patch':
+patch
+```
 
-### Explicitly set manifest version number based on [semantic versioning specification](https://semver.org/).
-`chromie pack . -v 1.0.0`
+results:
+```text
+hello world/
+├── dist/
+│   ├── web store/
+│   └── hello world-0.0.1.zip
+├── src/
+│   ├── images/
+│   └── manifest.json
+├── .gitignore
+└── .zipignore
+```
+
+### Chromie helps maintain [semantic versioning specification](https://semver.org/) and provides two options for specifying the version.
+#### Increment manifest version number based on type.
+`chromie pack -i major`
+#### Set manifest version to a specific number.
+`chromie pack -v 1.0.0`
 
 ### Store key-value pairs to the .chromie/settings.json file.
-`chromie config . email steffen@andersland.dev`
+`chromie config email hello@world.com`
+```text
+hello world/.chromie/settings.json
+{
+  "email": "hello@world.com"
+}
+```
 
-### Upload chrome extension zipfile to the Google Web Store.
-`chromie upload .`
+## Web Store Deployment using a service account
 This requires that the .chromie/settings.json file includes email, client_email, client_id, and private_key for authentication.
+```text
+hello world/.chromie/settings.json
+{
+  "email": "hello@world.com",
+  "client_email": "",
+  "private_key": ""
+}
+```
+### Upload chrome extension zipfile to the Google Web Store.
+`chromie upload`
 
 ### Update chrome extension Web Store with the latest chrome extension archive.
-`chromie update .`
+`chromie update`
 
 ### Publish chrome extension to the Google Web Store.
-`chromie publish .`
+`chromie publish`
 
 ## License
 The MIT License (MIT)
