@@ -27,7 +27,7 @@ hello world/
 ├── .gitignore
 └── .zipignore
 ```
-#### you can skip the prompt using the name flag
+#### You can skip the prompt using the name flag
 `chromie init -n "hello world"`
 
 ### Create a zip file containing all folders in the src directory excluding those listed in .zipignore.
@@ -68,7 +68,7 @@ hello world/.chromie/settings.json
 ```
 
 ## Web Store Deployment using a service account
-This requires that the .chromie/settings.json file includes email, client_email, client_id, and private_key for authentication.
+The following requires that the .chromie/settings.json file includes email, client_email, client_id, and private_key for authentication.
 ```text
 hello world/.chromie/settings.json
 {
