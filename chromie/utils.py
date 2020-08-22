@@ -48,9 +48,12 @@ class ManifestFile:
         major, minor, patch = current_version.split(".")
 
         if increment_name == "major":
+            patch = "0"
+            minor = "0"
             major = str(int(major) + 1)
 
         elif increment_name == "minor":
+            patch = "0"
             minor = str(int(minor) + 1)
 
         elif increment_name == "patch":

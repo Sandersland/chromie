@@ -2,23 +2,19 @@ import shutil
 import os
 
 from chromie.utils import ChromiePathFinder, ManifestFile
-from chromie.enum import Initialize
+from chromie.enum import Initialize, Path
 
 
 def make_extension_dir(finder):
 
-    os.makedirs(finder("web_store"))
-    os.makedirs(finder("images"))
+    os.makedirs(finder(Path.STORE_DIR))
+    os.makedirs(finder(Path.IMAGES_DIR))
 
-    with open(finder("gitignore"), "w") as f:
-        f.write("")
-
-    with open(finder("zipignore"), "w") as f:
-        # f.writelines(f"\n".join((".zipignore", "dist")))
+    with open(finder(Path.IGNORE_FILE), "w") as f:
         f.write("")
 
     ManifestFile(
-        finder("manifest"),
+        finder(Path.MANIFEST_FILE),
         {"name": finder.name, "manifest_version": 2, "version": "0.0.0"},
     ).write()
 

@@ -24,7 +24,6 @@ hello world/
 ├── src/
 │   ├── images/
 │   └── manifest.json
-├── .gitignore
 └── .zipignore
 ```
 #### You can skip the prompt using the name flag
@@ -48,7 +47,6 @@ hello world/
 ├── src/
 │   ├── images/
 │   └── manifest.json
-├── .gitignore
 └── .zipignore
 ```
 
