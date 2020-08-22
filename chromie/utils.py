@@ -15,8 +15,6 @@ class ChromiePathFinder(dict):
         return os.path.abspath(os.path.join(self.path, self.name))
 
     def __call__(self, dir):
-        if not dir:
-            raise ValueError(f"No path with the name {name} exists")
         return os.path.join(self.root, dir)
 
     def exists(self, name=""):
