@@ -1,4 +1,4 @@
-from setuptools import setup, Command
+from setuptools import setup, Command, find_packages
 import os
 import sys
 
@@ -36,7 +36,7 @@ setup(
     version=about["__version__"],
     description=about["__description__"],
     long_description=readme,
-    # packages=packages,
+    packages=find_packages(),
     long_description_content_type="text/markdown",
     url="https://github.com/Sandersland/chromie",
     author=about["__author__"],
