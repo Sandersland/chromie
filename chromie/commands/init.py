@@ -1,23 +1,28 @@
 import shutil
+import pathlib
 import os
-from pathlib import Path as Pa
 
 from chromie.utils import ChromiePathFinder, ManifestFile
 from chromie.enum import Initialize, Path
 
 
 def make_extension_dir(finder):
+    print("The following files and directories were created.")
     for d in [Path.DIST_DIR, Path.SRC_DIR, Path.STORE_DIR, Path.IMAGES_DIR]:
-        p = Pa(os.path.join(finder.root, d))
+        p = pathlib.Path(os.path.join(finder.root, d))
+        print(p.absolute())
         p.mkdir(parents=True)
 
     with open(finder(Path.IGNORE_FILE), "w") as f:
         f.write("")
 
-    ManifestFile(
-        finder(Path.MANIFEST_FILE),
+    manifest = ManifestFile(
+        os.path.join(finder.root, Path.MANIFEST_FILE),
         {"name": finder.name, "manifest_version": 2, "version": "0.0.0"},
-    ).write()
+    )
+    print(manifest.path)
+    manifest.write()
+    
 
 
 def init(args):
