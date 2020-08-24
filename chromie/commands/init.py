@@ -10,18 +10,17 @@ def make_ignore_file(root):
         f.write("")
 
 
-def make_extension_dir(root, name):
-    absroot = os.path.abspath(root)
-    os.makedirs(os.path.join(absroot, Path.STORE_DIR))
-    os.makedirs(os.path.join(absroot, Path.IMAGES_DIR))
+def make_extension_dir(finder):
 
-    make_ignore_file(absroot)
+    os.makedirs(os.path.join(finder.root, Path.STORE_DIR))
+    os.makedirs(os.path.join(finder.root, Path.IMAGES_DIR))
 
-    manifest = ManifestFile(
-        os.path.join(absroot, Path.MANIFEST_FILE),
-        {"name": name, "manifest_version": 2, "version": "0.0.0"},
-    )
-    manifest.write()
+    make_ignore_file(finder.root)
+
+    ManifestFile(
+        os.path.join(finder.root, Path.MANIFEST_FILE),
+        {"name": finder.name, "manifest_version": 2, "version": "0.0.0"},
+    ).write()
 
 
 def init(args):
@@ -50,5 +49,5 @@ def init(args):
     elif overwrite == True:
         shutil.rmtree(finder.root, ignore_errors=True)
 
-    if not finder.exists(finder.root):
-        make_extension_dir(finder.root, finder.name)
+    if not os.path.exists(finder.root):
+        make_extension_dir(finder)

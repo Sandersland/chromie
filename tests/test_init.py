@@ -12,11 +12,10 @@ class TestInit(unittest.TestCase):
     def test_make_ignore_file(self):
         args = ParserHelper.get_mocked_args("chromie init -n testy -o")
         finder = ChromiePathFinder(args.filepath, args.name)
-        absroot = os.path.abspath(finder.root)
         m = mock_open()
         with patch("chromie.commands.init.open", m, create=True):
-            make_ignore_file(absroot)
-            m.assert_called_once_with(os.path.join(absroot, Path.IGNORE_FILE), "w")
+            make_ignore_file(finder.root)
+            m.assert_called_once_with(os.path.join(finder.root, Path.IGNORE_FILE), "w")
             handle = m()
             handle.write.assert_called_once_with("")
 
@@ -29,16 +28,15 @@ class TestInit(unittest.TestCase):
         args = ParserHelper.get_mocked_args("chromie init -n testy -o")
         finder = ChromiePathFinder(args.filepath, args.name)
 
-        make_extension_dir(finder.root, finder.name)
-        absroot = os.path.abspath(finder.root)
+        make_extension_dir(finder)
         self.assertEqual(mocked_makedirs.call_count, 2)
         mocked_makedirs.assert_has_calls(
             [
-                call(os.path.join(absroot, Path.STORE_DIR)),
-                call(os.path.join(absroot, Path.IMAGES_DIR)),
+                call(os.path.join(finder.root, Path.STORE_DIR)),
+                call(os.path.join(finder.root, Path.IMAGES_DIR)),
             ],
         )
-        mocked_make_ignore.assert_called_with(os.path.abspath(finder.root))
+        mocked_make_ignore.assert_called_with(finder.root)
 
     @patch("chromie.commands.init.make_extension_dir")
     @patch("chromie.commands.init.ChromiePathFinder.exists", return_value=False)
@@ -48,7 +46,7 @@ class TestInit(unittest.TestCase):
         finder = ChromiePathFinder(args.filepath, args.name)
         init(args)
 
-        mocked_make_extension_dir.assert_called_with(finder.root, finder.name)
+        mocked_make_extension_dir.assert_called_with(finder)
 
     @patch("chromie.commands.init.ChromiePathFinder.exists", return_value=True)
     @patch("builtins.input", return_value="y")
