@@ -44,6 +44,7 @@ setup(
     license=about["__license__"],
     extras_require={"dev": ["twine", "black"]},
     install_requires=requires,
+    python_requires=">=3"
     entry_points={"console_scripts": ["chromie=chromie:main"]},
     cmdclass={"publish": Publish},
 )

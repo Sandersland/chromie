@@ -5,8 +5,8 @@ from chromie.utils import ChromiePathFinder, ManifestFile
 from chromie.enum import Initialize, Path
 
 
-def make_ignore_file(root):
-    with open(os.path.join(root, Path.IGNORE_FILE), "w") as f:
+def _mkfile(fp):
+    with open(fp, "w") as f:
         f.write("")
 
 
@@ -15,7 +15,7 @@ def make_extension_dir(finder):
     os.makedirs(os.path.join(finder.root, Path.STORE_DIR))
     os.makedirs(os.path.join(finder.root, Path.IMAGES_DIR))
 
-    make_ignore_file(finder.root)
+    _mkfile(os.path.join(finder.root, Path.IGNORE_FILE))
 
     ManifestFile(
         os.path.join(finder.root, Path.MANIFEST_FILE),
