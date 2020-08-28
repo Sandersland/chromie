@@ -28,6 +28,29 @@ class TestConfig(unittest.TestCase):
             handle.write.assert_called_once_with("")
             self.assertEqual(result.data, {})
 
+    @patch("chromie.config.os.path.isfile", return_value=True)
+    def test_set_new_values(self, mock_file):
+        m = mock_open()
+        path = "./this/is/a/test.json"
+        with patch("chromie.config.open", m):
+            config = Config.from_file(path)
+
+        with patch("chromie.config.open", m):
+            config.set_values(hello="there")
+            self.assertEqual(config.data, {"hello": "there"})
+
+    @patch("chromie.config.os.path.isfile", return_value=True)
+    def test_update_values(self, mock_file):
+        m = mock_open(read_data=json.dumps({"hello": "there"}))
+        path = "./this/is/a/test.json"
+        with patch("chromie.config.open", m):
+            config = Config.from_file(path)
+
+        with patch("chromie.config.open", m):
+            config.set_values(hi="again")
+            test_case = {"hello": "there", "hi": "again"}
+            self.assertEqual(config.data, test_case)
+
 
 if __name__ == "__main__":
     unittest.main()
