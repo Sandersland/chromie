@@ -22,11 +22,10 @@ def is_valid_version(version):
 
 def write_zip(zip, fp, root, name):
     path = os.path.abspath(os.path.join(root, name))
-    if os.name == "posix":
-        arcname = f"{fp.split('/')[-1]}/{name}"
-        zip.write(path, arcname)
-    else:
-        zip.write(path, os.path.basename(path))
+    arcname_root = fp.split("/")[-1]
+    arcname_path = re.search(r"(?<=src).+", path).group(0)
+    arcname = os.path.join(arcname_root, arcname_path)
+    zip.write(path, arcname)
 
 
 def package_directory(fp, src, target, ignore_paths=None):
