@@ -1,6 +1,6 @@
 import os
 import re
-from glob import glob
+from fnmatch import fnmatch
 import zipfile
 
 from chromie.utils import ChromiePathFinder, ManifestFile
@@ -20,29 +20,53 @@ def is_valid_version(version):
     return True if version and pattern.match(version) else False
 
 
-def write_zip(zip, fp, root, name):
-    path = os.path.abspath(os.path.join(root, name))
-    arcname_root = fp.split("/")[-1]
+def write_zip(zip, path, name):
     arcname_path = re.search(r"(?<=src).+", path).group(0)
-    arcname = os.path.join(arcname_root, arcname_path)
+    arcname = os.path.join(name, arcname_path)
     zip.write(path, arcname)
 
 
-def package_directory(fp, src, target, ignore_paths=None):
-    ignore_paths = [] if not ignore_paths else ignore_paths
-
+def package_directory(paths, fp, target):
+    name = fp.split("/")[-1]
     with zipfile.ZipFile(target, "w", zipfile.ZIP_STORED) as zip:
-        for dirname, subdirs, files in os.walk(src):
-            [
-                write_zip(zip, fp, dirname, fn)
-                for fn in files
-                if os.path.join(dirname, fn) not in ignore_paths
-            ]
-            [
-                write_zip(zip, fp, dirname, dn)
-                for dn in subdirs
-                if os.path.join(dirname, dn) not in ignore_paths
-            ]
+        for path in paths:
+            write_zip(zip, path, name)
+
+
+def filterdir(root_dir, ignore_patterns):
+    matches = []
+    flagged_for_removal = []
+    directory = listdir(root_dir, True)
+    for i, path in enumerate(directory):
+        if path in flagged_for_removal:
+            matches.append(i)
+            continue
+
+        for pat in ignore_patterns:
+            pattern = os.path.join("*", pat)
+            is_match = fnmatch(path, pattern)
+            if is_match and i not in matches:
+                matches.append(i)
+            if is_match and os.path.isdir(path):
+                flagged_for_removal.extend(listdir(path, True))
+
+    for index in sorted(matches, reverse=True):
+        del directory[index]
+
+    return directory
+
+
+def listdir(root_dir: str, recursive: bool = False):
+    if not recursive:
+        return os.listdir(root_dir)
+
+    paths = []
+
+    for root, dirnames, filenames in os.walk(root_dir):
+        paths.extend([os.path.join(root, d) for d in dirnames])
+        paths.extend([os.path.join(root, filename) for filename in filenames])
+
+    return sorted(paths)
 
 
 def package(args):
@@ -74,17 +98,9 @@ def package(args):
 
     src = finder(Path.SRC_DIR)
     with open(finder(Path.IGNORE_FILE), "r") as zipignore:
-        ignore_paths = [
-            name
-            for pattern in [line.rstrip() for line in zipignore.readlines()]
-            for name in glob(os.path.join(filepath, src, pattern))
-        ]
-
+        zip_paths = filterdir(src, zipignore.readlines())
         package_directory(
-            filepath,
-            os.path.join(filepath, src),
-            os.path.join(dist, f"{finder.name}-{version}.zip"),
-            ignore_paths,
+            zip_paths, filepath, os.path.join(dist, f"{finder.name}-{version}.zip"),
         )
 
 
