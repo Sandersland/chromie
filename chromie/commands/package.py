@@ -42,8 +42,9 @@ def filterdir(root_dir, ignore_patterns):
             matches.append(i)
             continue
 
-        for pat in ignore_patterns:
-            pattern = os.path.join("*", pat)
+        for pattern in ignore_patterns:
+            if not pattern.startswith("*"):
+                pattern = os.path.join("*", pattern)
             is_match = fnmatch(path, pattern)
             if is_match and i not in matches:
                 matches.append(i)

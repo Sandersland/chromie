@@ -66,7 +66,12 @@ class TestFilterDir(unittest.TestCase):
     def setUp(self):
         self.directory = mktempdirectory(
             directories=["test", "help"],
-            files=["test/hello.txt", "test/hello.html", "help/hello.html"],
+            files=[
+                "test/hello.txt",
+                "test/hello.html",
+                "help/hello.html",
+                "help/help.txt",
+            ],
         )
 
     def test_filter_dir(self):
@@ -77,7 +82,7 @@ class TestFilterDir(unittest.TestCase):
     def test_filter_dir_on_directory(self):
         patterns = ["test"]
         filtered = filterdir(self.directory, patterns)
-        self.assertEqual(len(filtered), 2)
+        self.assertEqual(len(filtered), 3)
 
     def test_filter_dir_on_asterisk(self):
         patterns = ["*"]
