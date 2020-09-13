@@ -99,7 +99,7 @@ def package(args):
 
     src = finder(Path.SRC_DIR)
     with open(finder(Path.IGNORE_FILE), "r") as zipignore:
-        zip_paths = filterdir(src, zipignore.readlines())
+        zip_paths = filterdir(src, zipignore.read().split("\n"))
         package_directory(
             zip_paths, filepath, os.path.join(dist, f"{finder.name}-{version}.zip"),
         )
