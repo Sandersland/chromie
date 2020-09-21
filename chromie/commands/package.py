@@ -74,24 +74,29 @@ def package(args):
 
     filepath = os.path.abspath(args.filepath)
     increment_version = args.increment_version
-    version = args.version
-
-    if not version and not increment_version:
-        increment_version = input(Package.VERSION_PROMPT)
 
     finder = ChromiePathFinder(filepath)
 
     manifest_file = ManifestFile.from_file(finder(Path.MANIFEST_FILE))
 
-    if increment_version and not version:
-        if not is_valid_increment_version(increment_version):
-            raise SystemExit(Package.INVALID_VERSION_ARGUMENT)
-        version = manifest_file.increment_version(increment_version)
+    if args.amend:
+        version = manifest_file.data["version"]
 
-    elif version and not increment_version:
-        if not is_valid_version(version):
-            raise SystemExit(Package.INVALID_VERSION_PATTERN)
-        manifest_file.set_version(version)
+    else:
+        version = args.version
+
+        if not version and not increment_version:
+            increment_version = input(Package.VERSION_PROMPT)
+
+        if increment_version and not version:
+            if not is_valid_increment_version(increment_version):
+                raise SystemExit(Package.INVALID_VERSION_ARGUMENT)
+            version = manifest_file.increment_version(increment_version)
+
+        elif version and not increment_version:
+            if not is_valid_version(version):
+                raise SystemExit(Package.INVALID_VERSION_PATTERN)
+            manifest_file.set_version(version)
 
     dist = finder(Path.DIST_DIR)
     if not os.path.isdir(dist):

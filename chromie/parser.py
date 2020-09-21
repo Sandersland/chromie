@@ -43,11 +43,23 @@ def parse_args(argv=None):
         "pack", parents=[parent_parser], help="package project directory"
     )
 
-    package_parser.add_argument(
+    package_exc = package_parser.add_mutually_exclusive_group()
+
+    package_exc.add_argument(
         "-i",
         "--increment-version",
         help="increment project version before packaging based with (major, minor, patch) as options",
         action="store",
+    )
+
+    package_exc.add_argument(
+        "-v", "--version", help="specify the version", action="store"
+    )
+
+    package_exc.add_argument(
+        "--amend",
+        help="make amendment to current project and do not increment version.",
+        action="store_true",
     )
 
     config_parser = subparsers.add_parser(
@@ -57,10 +69,6 @@ def parse_args(argv=None):
     config_parser.add_argument("name", action="store", type=str)
 
     config_parser.add_argument("value", action="store", type=str)
-
-    package_parser.add_argument(
-        "-v", "--version", help="specify the version", action="store"
-    )
 
     upload_parser = subparsers.add_parser(
         "upload", parents=[parent_parser], help="upload project to web store"
